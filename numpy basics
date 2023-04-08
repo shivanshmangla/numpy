@@ -1,0 +1,340 @@
+## yield_of_apples = w1 * temperature + w2 * rainfall + w3 * humidity
+# climate data for each region in vector list where 0th- temp, 1st- rainfall , 2nd-humidity
+
+delhi = [12, 53, 23]
+mumbai = [48, 53, 25]
+chennai = [34, 98, 12]
+agra = [90, 12, 38]
+
+##weights in vector form (w1,w2,w3)-
+weights = [0.2, 0.4, 0.1]
+
+# zip function-
+for item in zip(delhi, weights):  # creates pairs element by element and saves as tuples
+    print(item)
+
+for x, w in zip(delhi, weights):  # converts tuples into variables
+    print(x)
+    print(w)
+
+
+def crop_yeild(region, weights):
+    result = 0
+    for x, w in zip(region, weights):
+        result += w * x
+    return result
+
+
+print(crop_yeild(delhi, weights))
+print(crop_yeild(mumbai, weights))
+
+##The calculation performed by the crop_yield (element-wise multiplication of two vectors and taking a sum of the results)
+# is also called the dot product
+# The Numpy library provides a built-in function to compute the dot product of two vectors
+# However, we must first convert the lists into Numpy arrays.
+# Let's install the Numpy library using the pip package manager.
+
+import numpy as np
+
+delhi = np.array([12, 53, 23])  ##saves vectors in the form of numpy arrays
+mumbai = np.array([48, 53, 25])
+chennai = np.array([34, 98, 12])
+agra = np.array([90, 12, 38])
+
+delhi
+
+weights = np.array([0.2, 0.4, 0.1])
+
+print(delhi[0])  # we can access element just like python list
+
+# operating on numpy arrays
+
+print("np.dot(delhi,weights) :")
+print(np.dot(delhi,
+             weights))  # gives same output as (crop_yeild(delhi,weights)) (element by element multiplication then addition)
+
+delhi * weights  # performs element wise multiplication of the numpy array and saves it as a new numpy array
+
+(delhi * weights).sum()  # gives sum of all the elements of the numpy array
+
+# Multi-dimensional Numpy arrays-
+
+climate_data = np.array([[73, 67, 43],
+                         [91, 88, 64],
+                         [87, 134, 58],
+                         [102, 43, 37],
+                         [69, 96, 70]])
+climate_data  # stored as 2D numpy array just like a matrix
+
+print("\nclimate_data.shape :")
+print(climate_data.shape)  # returns (no of rows , no of columns)
+
+print("\nweights.shape :")
+print(weights.shape)
+
+# 3D array
+arr3 = np.array([
+    [[11, 12, 13],
+     [13, 14, 15]],
+    [[15, 16, 17],
+     [17, 18, 19.5]]])
+
+print("\narr3.shape :")
+print(arr3.shape)
+
+# All the elements in a numpy array have the same data type. You can check the data type of an array using the .dtype property.
+
+weights.dtype
+print("climate_data.dtype :")
+print(climate_data.dtype)
+
+# If an array contains even a single floating point number, all the other elements are also converted to floats.
+
+print(np.matmul(climate_data, weights))  # gives an 1D numpy array as output storing the matrix multiplication answer of
+# each location with the weights
+
+## OR ##
+
+climate_data @ weights  # does the same thing.
+
+"""## Benefits of using Numpy arrays
+Numpy arrays offer the following benefits over Python lists for operating on numerical data:
+
+Ease of use: You can write small, concise, and intuitive mathematical expressions like (kanto * weights).sum() rather than using loops & custom functions like crop_yield.
+
+Performance: Numpy operations and functions are implemented internally in C++, which makes them much faster than using Python statements & loops that are interpreted at runtime
+
+# Working with CSV data files
+### Numpy also provides helper functions reading from & writing to files. Let's download a file climate.txt, which contains 10,000 climate measurements (temperature, rainfall & humidity) in the following format:
+
+temperature,rainfall,humidity
+25.00,76.00,99.00
+39.00,65.00,70.00
+59.00,45.00,77.00
+84.00,63.00,38.00
+66.00,50.00,52.00
+41.00,94.00,77.00
+91.00,57.00,96.00
+49.00,96.00,99.00
+67.00,20.00,28.00
+...
+This format of storing data is known as comma-separated values or CSV.
+
+CSVs: A comma-separated values (CSV) file is a delimited text file that uses a comma to separate values. Each line of the file is a data record. Each record consists of one or more fields, separated by commas. A CSV file typically stores tabular data (numbers and text) in plain text, in which case each line will have the same number of fields. (Wikipedia)
+
+To read this file into a numpy array, we can use the genfromtxt function.
+"""
+
+import urllib.request
+
+urllib.request.urlretrieve(
+    'https://gist.github.com/BirajCoder/a4ffcb76fd6fb221d76ac2ee2b8584e9/raw/4054f90adfd361b7aa4255e99c2e874664094cea/climate.csv',
+    'climate.txt')
+
+##convert csv to numpy array using np.genfromtxt function
+
+climate_data = np.genfromtxt('climate.txt', delimiter=',', skip_header=1)
+
+climate_data
+climate_data.shape
+
+yeild = climate_data @ weights
+# OR
+yeild = np.matmul(climate_data, weights)
+
+print(yeild.shape)
+yeild
+
+##adding the yeilds back to climate_data as a 4th column in each numpy list, using  np.concatenate function.
+
+climate_results = np.concatenate((climate_data, yeild.reshape(10000, 1)), axis=1)
+
+# We use the np.reshape function to change the shape of yields from (10000,) to (10000,1).
+# axis = 1 to append the data in column(1) and not the row(0)
+
+climate_results
+
+np.savetxt('climate_results.txt',
+           climate_results,
+           fmt='%.2f',
+           delimiter=',',
+           header='temperature,rainfall,humidity,yeild_apples',
+           comments='')
+
+##converts numpy list back to .csv file
+
+"""# Numpy provides hundreds of functions for performing operations on arrays. Here are some commonly used functions:
+
+
+* Mathematics: `np.sum`, `np.exp`, `np.round`, arithemtic operators 
+* Array manipulation: `np.reshape`, `np.stack`, `np.concatenate`, `np.split`
+* Linear Algebra: `np.matmul`, `np.dot`, `np.transpose`, `np.eigvals`
+* Statistics: `np.mean`, `np.median`, `np.std`, `np.max`
+
+> **How to find the function you need?** The easiest way to find the right function for a specific operation or use-case is to do a web search. For instance, searching for "How to join numpy arrays" leads to [this tutorial on array concatenation](https://cmdlinetips.com/2018/04/how-to-concatenate-arrays-in-numpy/). 
+
+You can find a full list of array functions here: https://numpy.org/doc/stable/reference/routines.html
+
+# New Section
+
+## Arithmetic operations, broadcasting and comparison
+
+Numpy arrays support arithmetic operators like `+`, `-`, `*`, etc. You can perform an arithmetic operation with a single number (also called scalar) or with another array of the same shape. Operators make it easy to write mathematical expressions with multi-dimensional arrays.
+"""
+
+# element wise addition
+# arrays must be of the same size to add .
+arr2 = np.array([[1, 2, 3, 4],
+                 [5, 6, 7, 8],
+                 [9, 1, 2, 3]])
+
+arr3 = np.array([[11, 12, 13, 14],
+                 [15, 16, 17, 18],
+                 [19, 11, 12, 13]])
+
+arr4 = arr2 + arr3
+print("\n")
+print(arr4)
+
+arr4 = arr2 - arr3
+print("\n")
+print(arr4)
+
+# Adding a scalar
+print("\n")
+print(arr2 + 3)
+
+# Division by scalar
+print("\n")
+print(arr2 / 2)
+
+# Modulus with scalar
+print("\n")
+arr2 % 4
+
+"""### Array Broadcasting
+
+Numpy arrays also support *broadcasting*, allowing arithmetic operations between two arrays with different numbers of dimensions but compatible shapes. Let's look at an example to see how it works.
+"""
+
+arr2 = np.array([[1, 2, 3, 4],
+                 [5, 6, 7, 8],
+                 [9, 1, 2, 3]])
+print(arr2.shape)
+
+arr4 = np.array([4, 5, 6, 7])
+print(arr4.shape)
+
+print(arr2 + arr4)
+
+"""When the expression `arr2 + arr4` is evaluated, `arr4` (which has the shape `(4,)`) is replicated three times to match the shape `(3, 4)` of `arr2`. Numpy performs the replication without actually creating three copies of the smaller dimension array, thus improving performance and using lower memory.
+
+<img src="https://jakevdp.github.io/PythonDataScienceHandbook/figures/02.05-broadcasting.png" width="360">
+
+Broadcasting only works if one of the arrays can be replicated to match the other array's shape.
+"""
+
+arr5 = np.array([7, 8])
+print(arr5.shape)
+arr2 + arr5
+
+"""### Array Comparison
+
+Numpy arrays also support comparison operations like `==`, `!=`, `>` etc. The result is an array of booleans.
+"""
+
+# element by element comparison is performed
+arr1 = np.array([[1, 2, 3], [3, 4, 5]])
+arr2 = np.array([[2, 2, 3], [1, 2, 5]])
+
+print(arr1 == arr2)  # gives an array of comparing each element
+print("\n")
+print(arr1 != arr2)
+print("\n")
+print(arr1 >= arr2)
+print("\n")
+print(arr1 < arr2)
+
+# Array comparison is frequently used to count the number of equal elements in two arrays using the `sum` method.
+# Remember that `True` evaluates to `1` and `False` evaluates to `0` when booleans are used in arithmetic operations.
+
+(arr1 == arr2).sum()  # gives total no. of same elements in both array
+
+"""## Array indexing and slicing
+
+Numpy extends Python's list indexing notation using `[]` to multiple dimensions in an intuitive fashion. You can provide a comma-separated list of indices or ranges to select a specific element or a subarray (also called a slice) from a Numpy array.
+"""
+
+arr3 = np.array([
+    [[11, 12, 13, 14],
+     [13, 14, 15, 19]],
+
+    [[15, 16, 17, 21],
+     [63, 92, 36, 18]],
+
+    [[98, 32, 81, 23],
+     [17, 18, 19.5, 43]]])
+
+print(arr3.shape)
+
+# Single element
+print(arr3[1, 1, 2])
+
+# Subarray using ranges , shape doesnt change
+print(arr3[1:, 0:1, :2])
+##breaking it down---
+print("break down:")
+print("\narr3[1:] :\n")
+
+print(arr3[1:])
+
+print("arr3[1:, 0:1] :\n")
+
+print(arr3[1:, 0:1])
+
+print("arr3[1:, 0:1, :2] :\n")
+
+print(arr3[1:, 0:1, :2])
+
+# Using fewer indices
+
+arr3[:2, 1]
+
+# Using too many indices
+arr3[1, 3, 2, 1]
+
+# All zeros
+np.zeros((3, 2))  # pass no. of rows , columns as tuple
+
+# All ones
+
+np.ones([2, 2, 3])
+
+# Identity matrix
+
+np.eye(3)
+
+# Random vector ##picks values between 0 and 1 randomly
+print(np.random.rand(5))
+print("\n\n")
+# Random matrix
+print(np.random.randn(2, 3))  # rand vs. randn - what's the difference?
+# np.random.randn picks values from gaussian distribution.
+
+print("\n\n")
+# Fixed value
+print(np.full([2, 3], 42))
+
+# Range with start, end and step
+print(np.arange(10, 90, 3))
+
+print("\n\n")
+
+print(np.arange(10, 90, 3).shape)
+
+print("\n Reshaping such that multiplication of dimensions is same as 27: \n")
+print(np.arange(10, 90, 3).reshape(3, 3, 3))
+
+# Equally spaced numbers in a range
+##last number provides the no. of spaces we want in the equally ranged 3-27
+np.linspace(3, 27, 9)
